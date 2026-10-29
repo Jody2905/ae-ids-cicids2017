@@ -19,6 +19,37 @@ flags flows it cannot reconstruct well, and compares it with:
 3. **Unseen attacks:** if the Random Forest never saw a family during training, does it still catch it? The autoencoder never sees *any* attacks, so this is a fair test of the main argument for anomaly detection.
 4. **Why it fails:** which features the autoencoder reconstructs worst for each family, as a starting point for failure analysis.
 
+## Results
+
+**A supervised model mostly misses attack types it was never trained on. The
+autoencoder, trained only on normal traffic, still catches the high-volume ones.**
+
+![Detection of attack families the supervised model never saw](results/figures/unseen_families.png)
+
+For each attack family, the Random Forest was retrained with that family removed
+from its training data. The autoencoder and Isolation Forest never see any attacks.
+The figures are the share of that family's test flows each model flagged:
+
+| Attack family | Test flows | RF trained on it | RF never saw it | Autoencoder | Isolation Forest |
+|---|---:|---:|---:|---:|---:|
+| DoS | 96,865 | 99.6% | 0.2% | **78.5%** | 2.7% |
+| PortScan | 978 | 97.3% | 7.3% | **92.9%** | 13.5% |
+| DDoS | 64,007 | 99.9% | 63.6% | **83.5%** | 0.2% |
+| BruteForce | 4,576 | 98.5% | 0.0% | 0.8% | 0.0% |
+| WebAttack | 1,071 | 92.9% | 0.6% | 1.3% | 0.0% |
+| Bot | 718 | 65.7% | 0.0% | 0.4% | 0.0% |
+
+**Key findings**
+
+- **Unseen volumetric and scanning attacks:** without training examples, the Random Forest catches 0.2% of DoS and 7.3% of PortScan; the autoencoder catches 78.5% and 92.9%.
+- **DDoS is a partial exception:** the Random Forest still catches 63.6% of DDoS without seeing it, likely because flood patterns learned from DoS carry over.
+- **Application-layer attacks are invisible to every flow-based model** once unseen: brute force, web attacks and botnet traffic look like ordinary sessions in flow statistics, because the malicious part is in the payload.
+- **The cost is false alarms:** the autoencoder flags 4.2% of benign test flows, against about 0.1% for the Random Forest.
+- **Benign traffic drifts:** the autoencoder's threshold was set to flag about 1% of Monday's benign flows. On Tuesday to Thursday it flags 2.3–2.9%, and on Friday 8.5%. Whether Friday reflects real drift or mislabelled attack flows (see [Known dataset issues](#known-dataset-issues-worth-discussing-in-the-report)) is an open question.
+
+Infiltration (18 test flows) and Heartbleed (6) are too small to evaluate reliably.
+Full tables are in [`results/summary.md`](results/summary.md) and [`results/unseen.md`](results/unseen.md).
+
 ## Setup (Windows PowerShell)
 
 ```powershell
