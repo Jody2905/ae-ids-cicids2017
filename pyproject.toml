@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ae-ids"
+version = "0.1.0"
+description = "Autoencoder-based network intrusion detection on CIC-IDS2017, compared with Isolation Forest and Random Forest"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Jody-Ann Trimmingham" }]
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.1",
+    "pyarrow>=14",
+    "scikit-learn>=1.4",
+    "matplotlib>=3.8",
+    "joblib>=1.3",
+    "torch>=2.2",
+]
+
+[project.scripts]
+ids-prepare = "aeids.data:main"
+ids-train = "aeids.train:main"
+ids-evaluate = "aeids.evaluate:main"
+ids-unseen = "aeids.unseen:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

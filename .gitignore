@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.egg-info/
+data/raw/*
+!data/raw/.gitkeep
+data/processed/
+models/
+results/*
+!results/.gitkeep
+.ipynb_checkpoints/
+
+!results/figures/
+!results/summary.md
+!results/unseen.md
+data/fake/
+data/fake_raw/
